@@ -15,20 +15,30 @@ const queryType = new GraphQLObjectType({
       type: GraphQLString,
       resolve: () => 'world'
     },
-    // diceRoll: {
-    //   args: {
-    //     count: {
-    //       type: GraphQLInt,
-    //       defaultValue: 2
-    //     }
-    //   }
-    // }
     diceRoll: {
       type: new GraphQLList(GraphQLInt),
-      resolve: () => [roll(), roll()]
+      args: {
+        count: {
+          type: GraphQLInt,
+          defaultValue: 2
+        }
+      },
+      resolve: (_, args) => {
+        let rolls = [];
+        for (let i = 0; i < args.count; i++) {
+          rolls.push(roll());
+        }
+        return rolls;
+      }
+    },
+    usersCount: {
+      type: GraphQLInt,
+      resolve: (_, args, { db }) =>
+        db.collection('users').count()
     }
   }
 });
+
 
 const mySchema = new GraphQLSchema({
   // root query & root mutation definitions
